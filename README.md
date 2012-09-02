@@ -8,36 +8,49 @@ future.
 
 ``` javascript
 var fs = require('fake-fs')
+```
 
-// define a dir
+Define a dir
+
+``` javascript
+// note that it works like mkdir -p
 fs.dir('a/b/c')
 
-// it works like mkdir -p
 fs.existsSync('a').should.be.true
 fs.existsSync('a/b/c').should.be.true
+```
 
-// specify some meta
+Dir with some meta
+
+``` javascript
 fs.dir('bin', {
   mtime: 100,
   atime: 300,
   ctime: 50
 })
+fs.statSync('bin').should.have.property('mtime').equal(100)
+```
 
+Define an empty file
 
-// define an empty file
+``` javascript
 fs.file('foo/bar.txt')
 
 fs.readFileSync('foo/bar.txt', 'utf8').should.equal('')
 fs.statSync('foo').isDirectory().should.be.true // foo automatically created
+```
 
+Define a file with content
 
-// define a file with content
+``` javascript
 fs.file('hello.txt', 'Hello world') // utf8 assumed
 fs.file('base64.txt', 'TWFu', 'base64')
 fs.file('bin', new Buffer([10, 20]))
+```
 
+Define a file with arbitrary attributes
 
-// define a file with arbitrary attributes
+``` javascript
 fs.file('file', {
   content: 'asdf',
   mtime: new Date,
