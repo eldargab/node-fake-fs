@@ -85,6 +85,17 @@ describe('Fake FS', function () {
         })
     })
 
+    describe('.at(path)', function () {
+        it('Returns proxy for defining items prefixed with `path`', function () {
+            fs.at('home')
+                .file('.gitignore')
+                .dir('.local')
+            fs.statSync('home/.gitignore').isFile().should.be.true
+            fs.statSync('home/.local').isDirectory().should.be.true
+        })
+    })
+
+
     describe('.stat()', function () {
         it('Should return stats', function () {
             fs.file('a/b/c', {ctime: 123}).stat('a/b/c', cb)
