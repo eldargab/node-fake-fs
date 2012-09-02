@@ -1,0 +1,24 @@
+{
+  "name": "fake-fs",
+  "version": "0.0.0",
+  "description": "Fake file system for testing",
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/eldargab/node-fake-fs.git"
+  },
+  "keywords": [
+    "fs",
+    "fake",
+    "mocks",
+    "test"
+  ],
+  "devDependecies": {
+    "mocha": "1.4.2",
+    "sinon": "1.4.2"
+  },
+  "author": "Eldar Gabdullin <eldargab@gmail.com>",
+  "license": "MIT"
+}
