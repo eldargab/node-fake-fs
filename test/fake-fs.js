@@ -106,6 +106,12 @@ describe('Fake FS', function () {
             fs.stat('undefined', cb)
             cb.error('ENOENT')
         })
+
+        it('Should support absolute paths', function () {
+            fs.dir('a')
+            fs.stat(process.cwd(), cb)
+            cb.result().should.equal(fs.statSync('.'))
+        })
     })
 
     describe('.readdir()', function () {
