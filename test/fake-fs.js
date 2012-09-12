@@ -204,4 +204,34 @@ describe('Fake FS', function () {
             cb.error('EISDIR')
         })
     })
+
+    describe('.writeFile()', function () {
+        it('Should write file', function () {
+            fs.dir('.').writeFile('a', 'hello', cb)
+            cb.result()
+            fs.readFileSync('a', 'utf8').should.equal('hello')
+        })
+
+        it('Should respect encoding', function () {
+            fs.dir('.').writeFile('a', 'TWFu', 'base64', cb)
+            cb.result()
+            fs.readFileSync('a', 'utf8').should.equal('Man')
+        })
+
+        it('Should allow to write buffers', function () {
+            fs.dir('.').writeFile('a', new Buffer([10]), cb)
+            cb.result()
+            fs.readFileSync('a')[0].should.equal(10)
+        })
+
+        it('Should throw ENOTDIR when parent is not dir', function () {
+            fs.file('a').writeFile('a/b', '', cb)
+            cb.error('ENOTDIR')
+        })
+
+        it('Should throw ENOENT whent parent dir is not exist', function () {
+            fs.writeFile('a', '', cb)
+            cb.error('ENOENT')
+        })
+    })
 })
