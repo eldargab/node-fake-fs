@@ -96,8 +96,11 @@ describe('Fake FS', function () {
             fs.at('home')
                 .file('.gitignore')
                 .dir('.local')
+                .at('eldar')
+                    .dir('dev')
             fs.statSync('home/.gitignore').isFile().should.be.true
             fs.statSync('home/.local').isDirectory().should.be.true
+            fs.statSync('home/eldar/dev').isDirectory().should.be.true
         })
     })
 
