@@ -1,22 +1,25 @@
 var should = require('should')
-var sinon = require('sinon')
 var Fs = require('..')
 
 function Cb () {
-    var spy = sinon.spy()
+    var err, res
 
-    spy.error = function (err) {
-        this.calledOnce.should.be.true
-        this.firstCall.args[0].code.should.equal(err)
+    function cb (_err, _res) {
+        err = _err
+        res = _res
     }
 
-    spy.result = function () {
-        this.calledOnce.should.be.true
-        should.not.exist(this.firstCall.args[0])
-        return this.firstCall.args[1]
+    cb.result = function () {
+        should.not.exist(err)
+        return res
     }
 
-    return spy
+    cb.error = function (code) {
+        should.exist(err)
+        err.should.have.property('code').equal(code)
+    }
+
+    return cb
 }
 
 describe('Fake FS', function () {

@@ -17,7 +17,7 @@
   ],
   "devDependecies": {
     "mocha": "1.4.2",
-    "sinon": "1.4.2"
+    "should": "*"
   },
   "author": "Eldar Gabdullin <eldargab@gmail.com>",
   "license": "MIT"
