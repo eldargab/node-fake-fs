@@ -2,19 +2,22 @@ var should = require('should')
 var Fs = require('..')
 
 function Cb () {
-    var err, res
+    var err, res, called = 0
 
     function cb (_err, _res) {
         err = _err
         res = _res
+        called++
     }
 
     cb.result = function () {
+        called.should.equal(1)
         should.not.exist(err)
         return res
     }
 
     cb.error = function (code) {
+        called.should.equal(1)
         should.exist(err)
         err.should.have.property('code').equal(code)
     }
@@ -147,6 +150,35 @@ describe('Fake FS', function () {
                 exists.should.be.false
                 done()
             })
+        })
+    })
+
+    describe('.mkdir()', function () {
+        it('Should create dir', function () {
+            fs.dir('.').mkdir('a', cb)
+            cb.result()
+            fs.statSync('a').isDirectory().should.be.true
+        })
+
+        it('Should ignore mode', function () {
+            fs.dir('.').mkdir('a', 0777, cb)
+            cb.result()
+            fs.statSync('a').isDirectory().should.be.true
+        })
+
+        it('Should throw EEXIST on existing item', function () {
+            fs.dir('a').mkdir('a', cb)
+            cb.error('EEXIST')
+        })
+
+        it('Should throw ENOENT on non-existent parent', function () {
+            fs.mkdir('a', cb)
+            cb.error('ENOENT')
+        })
+
+        it('Should throw ENOTDIR on non-dir parent', function () {
+            fs.file('a').mkdir('a/b', cb)
+            cb.error('ENOTDIR')
         })
     })
 
