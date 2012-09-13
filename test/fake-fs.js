@@ -288,14 +288,14 @@ describe('Fake FS', function () {
         })
     })
 
-    describe('.fake()', function () {
+    describe('.patch()', function () {
         afterEach(function () {
-            fs.unfake()
+            fs.unpatch()
         })
         it('Should patch global fs with self methods', function () {
             var global = require('fs')
             var origStat = global.stat
-            fs.fake()
+            fs.patch()
             global.statSync.should.not.equal(origStat)
             global.existsSync('abrakadabra').should.be.false
             fs.dir('abrakadabra')
@@ -303,13 +303,13 @@ describe('Fake FS', function () {
         })
     })
 
-    describe('.unfake()', function () {
+    describe('.unpatch()', function () {
         it('Should restore original fs methods', function () {
             var global = require('fs')
             var origStat = global.stat
-            fs.fake()
+            fs.patch()
             origStat.should.not.equal(global.stat)
-            fs.unfake()
+            fs.unpatch()
             origStat.should.equal(global.stat)
         })
     })
