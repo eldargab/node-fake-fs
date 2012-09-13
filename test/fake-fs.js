@@ -287,4 +287,30 @@ describe('Fake FS', function () {
             })
         })
     })
+
+    describe('.fake()', function () {
+        afterEach(function () {
+            fs.unfake()
+        })
+        it('Should patch global fs with self methods', function () {
+            var global = require('fs')
+            var origStat = global.stat
+            fs.fake()
+            global.statSync.should.not.equal(origStat)
+            global.existsSync('abrakadabra').should.be.false
+            fs.dir('abrakadabra')
+            global.existsSync('abrakadabra').should.be.true
+        })
+    })
+
+    describe('.unfake()', function () {
+        it('Should restore original fs methods', function () {
+            var global = require('fs')
+            var origStat = global.stat
+            fs.fake()
+            origStat.should.not.equal(global.stat)
+            fs.unfake()
+            origStat.should.equal(global.stat)
+        })
+    })
 })
