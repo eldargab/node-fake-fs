@@ -33,6 +33,32 @@ describe('Fake FS', function () {
         cb = Cb()
     })
 
+    function snapshotTimes (p) {
+        var stat = fs.statSync(p)
+        return {
+            mtime: stat.mtime,
+            atime: stat.atime,
+            ctime: stat.ctime
+        }
+    }
+
+    function testTimes (p, fn, cb) {
+        var before = snapshotTimes(p)
+        setTimeout(function () {
+            fn()
+            var now = snapshotTimes(p)
+            cb(before, now)
+        })
+    }
+
+    function testTimesUpdated (p, fn, done) {
+        testTimes(p, fn, function (before, now) {
+            now.mtime.should.be.above(before.mtime)
+            now.mtime.should.be.equal(now.ctime)
+            done()
+        })
+    }
+
     describe('.dir(path, [opts])', function () {
         it('Should define dir', function () {
             fs.dir('a/b/c').statSync('a/b/c').isDirectory().should.be.true
@@ -183,6 +209,13 @@ describe('Fake FS', function () {
             fs.file('a').mkdir('a/b', cb)
             cb.error('ENOTDIR')
         })
+
+        it('Should update parent times', function (done) {
+            fs.dir('.')
+            testTimesUpdated('.', function () {
+                fs.mkdir('dir')
+            }, done)
+        })
     })
 
     describe('.readFile()', function () {
@@ -235,6 +268,23 @@ describe('Fake FS', function () {
         it('Should throw ENOENT whent parent dir is not exist', function () {
             fs.writeFile('a', '', cb)
             cb.error('ENOENT')
+        })
+
+        it('Should update dir times on file creation', function (done) {
+            fs.dir('.')
+            testTimesUpdated('.', function () {
+                fs.writeFile('a')
+            }, done)
+        })
+
+        it('Should not update dir times on file update', function (done) {
+            fs.file('a')
+            testTimes('.', function () {
+                fs.writeFile('a', 'a')
+            }, function (before, now) {
+                before.should.eql(now)
+                done()
+            })
         })
     })
 })
