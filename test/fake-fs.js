@@ -260,12 +260,12 @@ describe('Fake FS', function () {
             fs.readFileSync('a')[0].should.equal(10)
         })
 
-        it('Should throw ENOTDIR when parent is not dir', function () {
+        it('Should throw ENOTDIR when parent is not a dir', function () {
             fs.file('a').writeFile('a/b', '', cb)
             cb.error('ENOTDIR')
         })
 
-        it('Should throw ENOENT whent parent dir is not exist', function () {
+        it('Should throw ENOENT whent parent dir does not exist', function () {
             fs.writeFile('a', '', cb)
             cb.error('ENOENT')
         })

@@ -1,30 +1,31 @@
 # fake-fs
 
-Fake node.js file system for testing. Supports `stat`, `readdir`, `readFile`,
-`exists` and their sync counterparts. Perhaps more methods will be added in
-future.
+Fake node.js file system for testing. Supports `stat`, `exists`, `readdir`,
+`readFile`, `writeFile`, `mkdir` and their sync counterparts. Perhaps a bit
+more will be added in future.
 
 ## Usage
 
 ``` javascript
-var fs = require('fake-fs')
+var Fs = require('fake-fs')
+var fs = new Fs
 ```
 
 Define a dir
 
 ``` javascript
-// note that it works like mkdir -p
 fs.dir('a/b/c')
-
-fs.existsSync('a').should.be.true
 fs.existsSync('a/b/c').should.be.true
+fs.existsSync('a').should.be.true // note that it works like mkdir -p
+fs.existsSync('.').should.be.true // in fact you defined an item at absolute path
+fs.existsSync(process.cwd()).should.be.true
 ```
 
 Dir with some meta
 
 ``` javascript
 fs.dir('bin', {
-  mtime: 100,
+  mtime: 100, // by default it will be set to (new Date)
   atime: 300,
   ctime: 50
 })
@@ -35,7 +36,6 @@ Define an empty file
 
 ``` javascript
 fs.file('foo/bar.txt')
-
 fs.readFileSync('foo/bar.txt', 'utf8').should.equal('')
 fs.statSync('foo').isDirectory().should.be.true // foo automatically created
 ```
@@ -68,9 +68,58 @@ returns a proxy which prefixes everything you defined with `path`.
 fs.at('public/assets')
   .file('style.css')
   .file('icons.png')
-
 fs.existsSync('public/assets/icons.png').should.be.true
 ```
+
+It also has convenience methods for patching-unpatching of global `fs` object.
+
+``` javascript
+fs.patch()
+fs.dir('foo')
+require('fs').existsSync('foo').should.be.true
+fs.unpatch()
+require('fs').existsSync('foo').should.be.false
+```
+
+## Supported features
+
+```
+.stat()
+  ✓ Should return stats
+  ✓ Should throw ENOENT on non-existent path
+  ✓ Should support absolute paths
+.readdir()
+  ✓ Should list a dir contents
+  ✓ Should throw ENOENT on non-existent path
+  ✓ Should throw ENOTDIR on non-dir
+.exists()
+  ✓ Should return true on existent path
+  ✓ Should return false for non-existent path
+.mkdir()
+  ✓ Should create dir
+  ✓ Should ignore mode
+  ✓ Should throw EEXIST on existing item
+  ✓ Should throw ENOENT on non-existent parent
+  ✓ Should throw ENOTDIR on non-dir parent
+  ✓ Should update parent times
+.readFile()
+  ✓ Should read file contents
+  ✓ Should decode file contents
+  ✓ Should throw ENOENT on non-existent file
+  ✓ Should throw EISDIR on directory
+.writeFile()
+  ✓ Should write file
+  ✓ Should respect encoding
+  ✓ Should allow to write buffers
+  ✓ Should throw ENOTDIR when parent is not a dir
+  ✓ Should throw ENOENT whent parent dir does not exist
+  ✓ Should update dir times on file creation
+  ✓ Should not update dir times on file update
+```
+
+## Notes
+
+If you decide to use this library please depend on strict versions.
 
 ## Installation
 
@@ -80,7 +129,7 @@ Via npm
 npm install fake-fs
 ```
 
-To run tests install dev dependencies and execute `npm test` command.
+To run tests install dev dependencies and run `npm test` command.
 
 ```
 npm install -d
