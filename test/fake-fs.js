@@ -225,6 +225,35 @@ describe('Fake FS', function () {
         })
     })
 
+    describe('.rmdir()', function () {
+        it('Should remove an existing direcory', function () {
+            fs.dir('a/b')
+            fs.rmdirSync('a/b')
+            fs.existsSync('a/b').should.be.false
+        })
+
+        it('Should remove an existing direcory, its subdirectories and files', function () {
+            fs.dir('a/b/c')
+            fs.file('a/b/file.txt')
+            
+            fs.rmdirSync('a/b')
+
+            fs.existsSync('a/b/c').should.be.false
+            fs.existsSync('a/b/file.txt').should.be.false
+            fs.existsSync('a/b').should.be.false
+
+            fs.existsSync('a').should.be.true
+        })
+
+        it('Should throw an ENOTDIR error on file', function () {
+            fs.file('a/file.txt')
+
+            fs.rmdir('a/file.txt', cb)
+
+            cb.error('ENOTDIR')
+        })
+    })
+
     describe('.readFile()', function () {
         it('Should read file contents', function () {
             var content = new Buffer([1, 2, 3])
