@@ -180,6 +180,13 @@ describe('Fake FS', function () {
                 done()
             })
         })
+
+        it('Should return true for root path', function (done) {
+            fs.exists('/', function (exists) {
+                exists.should.be.true
+                done()
+            })
+        })
     })
 
     describe('.mkdir()', function () {
