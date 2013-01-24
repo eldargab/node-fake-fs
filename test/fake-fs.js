@@ -254,6 +254,24 @@ describe('Fake FS', function () {
         })
     })
 
+    describe('.unlink()', function () {
+        it('Should remove an existing file', function () {
+            fs.file('a/file.txt')
+
+            fs.unlinkSync('a/file.txt')
+            
+            fs.existsSync('a/file.txt').should.be.false
+        })
+
+        it('Should throw an EISDIR error on directory', function () {
+            fs.dir('a/b')
+
+            fs.unlink('a/b', cb)
+
+            cb.error('EISDIR')
+        })
+    })
+
     describe('.readFile()', function () {
         it('Should read file contents', function () {
             var content = new Buffer([1, 2, 3])
