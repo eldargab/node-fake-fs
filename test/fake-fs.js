@@ -252,6 +252,14 @@ describe('Fake FS', function () {
 
             cb.error('ENOTDIR')
         })
+
+        it('Should update dir times on directory removal', function (done) {
+            fs.dir('a/b')
+            
+            testTimesUpdated('a', function () {
+                fs.rmdir('a/b')
+            }, done)
+        })
     })
 
     describe('.unlink()', function () {
@@ -269,6 +277,14 @@ describe('Fake FS', function () {
             fs.unlink('a/b', cb)
 
             cb.error('EISDIR')
+        })
+
+        it('Should update dir times on file removal', function (done) {
+            fs.file('a/file.txt')
+
+            testTimesUpdated('a', function () {
+                fs.unlink('a/file.txt')
+            }, done)
         })
     })
 
