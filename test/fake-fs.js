@@ -255,7 +255,7 @@ describe('Fake FS', function () {
 
         it('Should update dir times on directory removal', function (done) {
             fs.dir('a/b')
-            
+
             testTimesUpdated('a', function () {
                 fs.rmdir('a/b')
             }, done)
@@ -287,6 +287,109 @@ describe('Fake FS', function () {
             }, done)
         })
     })
+
+    describe('.rename()', function () {
+        it('Should rename an existing file', function () {
+            fs.file('a/file.txt')
+
+            fs.renameSync('a/file.txt', 'a/file-new.txt')
+            
+            fs.existsSync('a/file.txt').should.be.false
+            fs.existsSync('a/file-new.txt').should.be.true
+        })
+
+        it('Should rename (move) an existing file', function () {
+            fs.file('a/file.txt')
+            fs.dir('c/d')
+
+            fs.renameSync('a/file.txt', 'c/d/file-new.txt')
+            
+            fs.existsSync('a/file.txt').should.be.false
+            fs.existsSync('c/d/file-new.txt').should.be.true
+        })
+
+        it('Should rename an existing directory', function () {
+            fs.dir('a/b')
+
+            fs.renameSync('a/b', 'a/b-new')
+            
+            fs.existsSync('a/b').should.be.false
+            fs.existsSync('a/b-new').should.be.true
+        })
+
+        it('Should rename (move) an existing directory', function () {
+            fs.dir('a/b')
+            fs.dir('c/d')
+
+            fs.renameSync('a/b', 'c/d/b-new')
+            
+            fs.existsSync('a/b').should.be.false
+            fs.existsSync('c/d/b-new').should.be.true
+        })
+
+        it('Should throw EPERM when new path points to an existing directory', function () {
+            fs.dir('a/b')
+            fs.dir('c/d')
+
+            fs.rename('a/b', 'c/d', cb)
+
+            cb.error('EPERM')
+        })
+
+        /* 
+        One could argue about this, since with node.js fs, when renaming a file or a directory 
+        you can overwrite an existing file (you CANNOT overwrite an existing directory).
+        */
+        it('Should throw EPERM when new path points to existing file', function () {
+            fs.file('a/file1.txt')
+            fs.file('c/file2.txt')
+
+            fs.rename('a/file1.txt', 'c/file2.txt', cb)
+            
+            cb.error('EPERM')
+        })
+
+        it('Should throw ENOENT when new (directory) path points to a non-existent parent', function () {
+            fs.dir('a/b')
+
+            fs.rename('a/b', 'c/d', cb)
+
+            cb.error('ENOENT')
+        })
+
+        it('Should throw ENOTDIR when new path points to a parent that is not a directory', function () {
+            fs.dir('a/b')
+            fs.file('c');
+
+            fs.rename('a/b', 'c/d', cb)
+
+            cb.error('ENOTDIR')
+        })
+
+        it('Should update dir times on rename (move)', function (done) {
+            fs.dir('a/b')
+            fs.dir('c/d')
+
+            var oldPathBefore = snapshotTimes('a')
+            var newPathBefore = snapshotTimes('c/d')
+
+            setTimeout(function () {
+                fs.renameSync('a/b', 'c/d/b-new')
+                var oldPathNow = snapshotTimes('a')
+                var newPathNow = snapshotTimes('c/d')
+
+                var testTimesInner = function (before, now) {
+                    now.mtime.should.be.above(before.mtime)
+                    now.mtime.should.be.equal(now.ctime)
+                }
+
+                testTimesInner(oldPathBefore, oldPathNow)
+                testTimesInner(newPathBefore, newPathNow)
+
+                done()
+            })
+        })
+    });
 
     describe('.readFile()', function () {
         it('Should read file contents', function () {
