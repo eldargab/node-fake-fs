@@ -1,7 +1,7 @@
 # fake-fs
 
 Fake node.js file system for testing. Supports `stat`, `exists`, `readdir`,
-`readFile`, `writeFile`, `mkdir`, `rmdir`, `unlink` and their sync counterparts.
+`readFile`, `writeFile`, `mkdir`, `rmdir`, `unlink`, `rename` and their sync counterparts.
 
 ## Usage
 
