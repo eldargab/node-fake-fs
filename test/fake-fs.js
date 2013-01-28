@@ -235,7 +235,7 @@ describe('Fake FS', function () {
         it('Should remove an existing direcory, its subdirectories and files', function () {
             fs.dir('a/b/c')
             fs.file('a/b/file.txt')
-            
+
             fs.rmdirSync('a/b')
 
             fs.existsSync('a/b/c').should.be.false
@@ -267,7 +267,7 @@ describe('Fake FS', function () {
             fs.file('a/file.txt')
 
             fs.unlinkSync('a/file.txt')
-            
+
             fs.existsSync('a/file.txt').should.be.false
         })
 
@@ -293,7 +293,7 @@ describe('Fake FS', function () {
             fs.file('a/file.txt')
 
             fs.renameSync('a/file.txt', 'a/file-new.txt')
-            
+
             fs.existsSync('a/file.txt').should.be.false
             fs.existsSync('a/file-new.txt').should.be.true
         })
@@ -303,7 +303,7 @@ describe('Fake FS', function () {
             fs.dir('c/d')
 
             fs.renameSync('a/file.txt', 'c/d/file-new.txt')
-            
+
             fs.existsSync('a/file.txt').should.be.false
             fs.existsSync('c/d/file-new.txt').should.be.true
         })
@@ -312,7 +312,7 @@ describe('Fake FS', function () {
             fs.dir('a/b')
 
             fs.renameSync('a/b', 'a/b-new')
-            
+
             fs.existsSync('a/b').should.be.false
             fs.existsSync('a/b-new').should.be.true
         })
@@ -322,7 +322,7 @@ describe('Fake FS', function () {
             fs.dir('c/d')
 
             fs.renameSync('a/b', 'c/d/b-new')
-            
+
             fs.existsSync('a/b').should.be.false
             fs.existsSync('c/d/b-new').should.be.true
         })
@@ -336,17 +336,13 @@ describe('Fake FS', function () {
             cb.error('EPERM')
         })
 
-        /* 
-        One could argue about this, since with node.js fs, when renaming a file or a directory 
-        you can overwrite an existing file (you CANNOT overwrite an existing directory).
-        */
-        it('Should throw EPERM when new path points to existing file', function () {
+        it('Should not throw EPERM when new path points to existing file', function () {
             fs.file('a/file1.txt')
             fs.file('c/file2.txt')
 
             fs.rename('a/file1.txt', 'c/file2.txt', cb)
-            
-            cb.error('EPERM')
+
+            cb.result()
         })
 
         it('Should throw ENOENT when new (directory) path points to a non-existent parent', function () {
