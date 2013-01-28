@@ -180,6 +180,13 @@ describe('Fake FS', function () {
                 done()
             })
         })
+
+        it('Should return true for root path', function (done) {
+            fs.exists('/', function (exists) {
+                exists.should.be.true
+                done()
+            })
+        })
     })
 
     describe('.mkdir()', function () {
@@ -214,6 +221,69 @@ describe('Fake FS', function () {
             fs.dir('.')
             testTimesUpdated('.', function () {
                 fs.mkdir('dir')
+            }, done)
+        })
+    })
+
+    describe('.rmdir()', function () {
+        it('Should remove an existing direcory', function () {
+            fs.dir('a/b')
+            fs.rmdirSync('a/b')
+            fs.existsSync('a/b').should.be.false
+        })
+
+        it('Should remove an existing direcory, its subdirectories and files', function () {
+            fs.dir('a/b/c')
+            fs.file('a/b/file.txt')
+            
+            fs.rmdirSync('a/b')
+
+            fs.existsSync('a/b/c').should.be.false
+            fs.existsSync('a/b/file.txt').should.be.false
+            fs.existsSync('a/b').should.be.false
+
+            fs.existsSync('a').should.be.true
+        })
+
+        it('Should throw an ENOTDIR error on file', function () {
+            fs.file('a/file.txt')
+
+            fs.rmdir('a/file.txt', cb)
+
+            cb.error('ENOTDIR')
+        })
+
+        it('Should update dir times on directory removal', function (done) {
+            fs.dir('a/b')
+            
+            testTimesUpdated('a', function () {
+                fs.rmdir('a/b')
+            }, done)
+        })
+    })
+
+    describe('.unlink()', function () {
+        it('Should remove an existing file', function () {
+            fs.file('a/file.txt')
+
+            fs.unlinkSync('a/file.txt')
+            
+            fs.existsSync('a/file.txt').should.be.false
+        })
+
+        it('Should throw an EISDIR error on directory', function () {
+            fs.dir('a/b')
+
+            fs.unlink('a/b', cb)
+
+            cb.error('EISDIR')
+        })
+
+        it('Should update dir times on file removal', function (done) {
+            fs.file('a/file.txt')
+
+            testTimesUpdated('a', function () {
+                fs.unlink('a/file.txt')
             }, done)
         })
     })
