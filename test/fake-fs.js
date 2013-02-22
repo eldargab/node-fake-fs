@@ -355,7 +355,7 @@ describe('Fake FS', function () {
 
         it('Should throw ENOTDIR when new path points to a parent that is not a directory', function () {
             fs.dir('a/b')
-            fs.file('c');
+            fs.file('c')
 
             fs.rename('a/b', 'c/d', cb)
 
@@ -385,7 +385,7 @@ describe('Fake FS', function () {
                 done()
             })
         })
-    });
+    })
 
     describe('.readFile()', function () {
         it('Should read file contents', function () {
