@@ -232,17 +232,12 @@ describe('Fake FS', function () {
             fs.existsSync('a/b').should.be.false
         })
 
-        it('Should remove an existing direcory, its subdirectories and files', function () {
+        it('Should throw ENOTEMPTY for non empty dirs', function () {
             fs.dir('a/b/c')
-            fs.file('a/b/file.txt')
 
-            fs.rmdirSync('a/b')
+            fs.rmdir('a/b', cb)
 
-            fs.existsSync('a/b/c').should.be.false
-            fs.existsSync('a/b/file.txt').should.be.false
-            fs.existsSync('a/b').should.be.false
-
-            fs.existsSync('a').should.be.true
+            cb.error('ENOTEMPTY')
         })
 
         it('Should throw an ENOTDIR error on file', function () {
