@@ -80,6 +80,25 @@ fs.unpatch()
 require('fs').existsSync('foo').should.be.false
 ```
 
+## Notes
+
+Methods of newly created `fs` object are not binded to that instance.
+That means
+
+```javascript
+var fs = new Fs
+var exists = fs.existsSync
+exists('/foo/bar')
+```
+
+doesn't work. You can use `.bind()` if that's a problem.
+
+```javascript
+var fs = new Fs().bind()
+var exists = fs.existsSync
+exists('/foo/bar') // now everything is ok
+```
+
 ## Supported features
 
 ```
@@ -94,6 +113,7 @@ require('fs').existsSync('foo').should.be.false
 .exists()
   ✓ Should return true on existent path
   ✓ Should return false for non-existent path
+  ✓ Should return true for root path
 .mkdir()
   ✓ Should create dir
   ✓ Should ignore mode
@@ -101,6 +121,25 @@ require('fs').existsSync('foo').should.be.false
   ✓ Should throw ENOENT on non-existent parent
   ✓ Should throw ENOTDIR on non-dir parent
   ✓ Should update parent times
+.rmdir()
+  ✓ Should remove an existing direcory
+  ✓ Should throw ENOTEMPTY for non empty dirs
+  ✓ Should throw an ENOTDIR error on file
+  ✓ Should update dir times on directory removal
+.unlink()
+  ✓ Should remove an existing file
+  ✓ Should throw an EISDIR error on directory
+  ✓ Should update dir times on file removal
+.rename()
+  ✓ Should rename an existing file
+  ✓ Should rename (move) an existing file
+  ✓ Should rename an existing directory
+  ✓ Should rename (move) an existing directory
+  ✓ Should throw EPERM when new path points to an existing directory
+  ✓ Should not throw EPERM when new path points to existing file
+  ✓ Should throw ENOENT when new (directory) path points to a non-existent parent
+  ✓ Should throw ENOTDIR when new path points to a parent that is not a directory
+  ✓ Should update dir times on rename (move)
 .readFile()
   ✓ Should read file contents
   ✓ Should decode file contents
@@ -116,10 +155,6 @@ require('fs').existsSync('foo').should.be.false
   ✓ Should not update dir times on file update
 ```
 
-## Notes
-
-If you decide to use this library please depend on strict versions.
-
 ## Installation
 
 Via npm
@@ -128,10 +163,10 @@ Via npm
 npm install fake-fs
 ```
 
-To run tests install dev dependencies and run `npm test` command.
+To run tests use `npm test` command.
 
 ```
-npm install -d
+npm install
 npm test
 ```
 
