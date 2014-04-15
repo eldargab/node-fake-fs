@@ -82,7 +82,7 @@ require('fs').existsSync('foo').should.be.false
 
 ## Notes
 
-Methods of newly created `fs` object are not binded to that instance.
+Methods of new fs object are not binded to the instance.
 That means
 
 ```javascript
