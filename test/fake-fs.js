@@ -477,4 +477,12 @@ describe('Fake FS', function () {
             origStat.should.equal(global.stat)
         })
     })
+
+    describe('.bind()', function() {
+        it('Should bind all methods to self', function() {
+            fs.bind().dir('/foo/bar')
+            var exists = fs.existsSync
+            exists('/foo/bar').should.be.true
+        })
+    })
 })
