@@ -1,6 +1,6 @@
 {
   "name": "fake-fs",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Fake file system for testing",
   "scripts": {
     "test": "mocha -R spec"
