@@ -1,22 +1,22 @@
 var should = require('should')
 var Fs = require('..')
 
-function Cb () {
+function Cb() {
   var err, res, called = 0
 
-  function cb (_err, _res) {
+  function cb(_err, _res) {
     err = _err
     res = _res
     called++
   }
 
-  cb.result = function () {
+  cb.result = function() {
     called.should.equal(1)
     should.not.exist(err)
     return res
   }
 
-  cb.error = function (code) {
+  cb.error = function(code) {
     called.should.equal(1)
     should.exist(err)
     err.should.have.property('code').equal(code)
@@ -25,10 +25,10 @@ function Cb () {
   return cb
 }
 
-describe('Fake FS', function () {
+describe('Fake FS', function() {
   var fs, cb
 
-  beforeEach(function () {
+  beforeEach(function() {
     fs = new Fs
     cb = Cb()
   })
@@ -44,7 +44,7 @@ describe('Fake FS', function () {
 
   function testTimes (p, fn, cb) {
     var before = snapshotTimes(p)
-    setTimeout(function () {
+    setTimeout(function() {
       fn()
       var now = snapshotTimes(p)
       cb(before, now)
@@ -52,19 +52,19 @@ describe('Fake FS', function () {
   }
 
   function testTimesUpdated (p, fn, done) {
-    testTimes(p, fn, function (before, now) {
+    testTimes(p, fn, function(before, now) {
       now.mtime.should.be.above(before.mtime)
       now.mtime.should.be.equal(now.ctime)
       done()
     })
   }
 
-  describe('.dir(path, [opts])', function () {
-    it('Should define dir', function () {
+  describe('.dir(path, [opts])', function() {
+    it('Should define dir', function() {
       fs.dir('a/b/c').statSync('a/b/c').isDirectory().should.be.true
     })
 
-    it('Should support options', function () {
+    it('Should support options', function() {
       var stat = fs.dir('a', {
         mtime: 10,
         atime: 30
@@ -73,7 +73,7 @@ describe('Fake FS', function () {
       stat.should.have.property('atime').equal(30)
     })
 
-    it('Should work like mkdir -p', function () {
+    it('Should work like mkdir -p', function() {
       fs.dir('a', { mtime: 100 })
       fs.dir('a/b/c')
       fs.statSync('a').mtime.should.equal(100)
@@ -81,18 +81,18 @@ describe('Fake FS', function () {
     })
   })
 
-  describe('.file(path, [opts | content, [encoding]]', function () {
-    it('Should define file', function () {
+  describe('.file(path, [opts | content, [encoding]]', function() {
+    it('Should define file', function() {
       fs.file('a/b.txt').statSync('a/b.txt').isFile().should.be.true
     })
 
-    it('Should work like mkdir -p for parent dir', function () {
+    it('Should work like mkdir -p for parent dir', function() {
       fs.dir('a', { mtime: 100 })
       fs.file('a/b.txt')
       fs.statSync('a').mtime.should.equal(100)
     })
 
-    it('Should support content & encoding params', function () {
+    it('Should support content & encoding params', function() {
       fs.file('hello.txt', 'hello')
         .readFileSync('hello.txt', 'utf8')
         .should.equal('hello')
@@ -104,7 +104,7 @@ describe('Fake FS', function () {
       fs.readFileSync('bin2')[0].should.equal(10)
     })
 
-    it('Should support options param', function () {
+    it('Should support options param', function() {
       fs.file('hello.txt', {
         atime: 10,
         mtime: 20,
@@ -117,8 +117,8 @@ describe('Fake FS', function () {
     })
   })
 
-  describe('.at(path)', function () {
-    it('Returns proxy for defining items prefixed with `path`', function () {
+  describe('.at(path)', function() {
+    it('Returns proxy for defining items prefixed with `path`', function() {
       fs.at('home')
         .file('.gitignore')
         .dir('.local')
@@ -131,108 +131,108 @@ describe('Fake FS', function () {
   })
 
 
-  describe('.stat()', function () {
-    it('Should return stats', function () {
+  describe('.stat()', function() {
+    it('Should return stats', function() {
       fs.file('a/b/c', {ctime: 123}).stat('a/b/c', cb)
       cb.result().should.have.property('ctime').equal(123)
     })
 
-    it('Should throw ENOENT on non-existent path', function () {
+    it('Should throw ENOENT on non-existent path', function() {
       fs.stat('undefined', cb)
       cb.error('ENOENT')
     })
 
-    it('Should support absolute paths', function () {
+    it('Should support absolute paths', function() {
       fs.dir('a')
       fs.stat(process.cwd(), cb)
       cb.result().should.equal(fs.statSync('.'))
     })
   })
 
-  describe('.readdir()', function () {
-    it('Should list a dir contents', function () {
+  describe('.readdir()', function() {
+    it('Should list a dir contents', function() {
       fs.dir('a').file('b.txt').readdir('.', cb)
       cb.result().should.eql(['a', 'b.txt'])
     })
 
-    it('Should throw ENOENT on non-existent path', function () {
+    it('Should throw ENOENT on non-existent path', function() {
       fs.readdir('a', cb)
       cb.error('ENOENT')
     })
 
-    it('Should throw ENOTDIR on non-dir', function () {
+    it('Should throw ENOTDIR on non-dir', function() {
       fs.file('a.txt').readdir('a.txt', cb)
       cb.error('ENOTDIR')
     })
   })
 
-  describe('.exists()', function () {
-    it('Should return true on existent path', function (done) {
-      fs.dir('asd').exists('asd', function (exists) {
+  describe('.exists()', function() {
+    it('Should return true on existent path', function(done) {
+      fs.dir('asd').exists('asd', function(exists) {
         exists.should.be.true
         done()
       })
     })
 
-    it('Should return false for non-existent path', function (done) {
-      fs.exists('non-existent', function (exists) {
+    it('Should return false for non-existent path', function(done) {
+      fs.exists('non-existent', function(exists) {
         exists.should.be.false
         done()
       })
     })
 
-    it('Should return true for root path', function (done) {
-      fs.exists('/', function (exists) {
+    it('Should return true for root path', function(done) {
+      fs.exists('/', function(exists) {
         exists.should.be.true
         done()
       })
     })
   })
 
-  describe('.mkdir()', function () {
-    it('Should create dir', function () {
+  describe('.mkdir()', function() {
+    it('Should create dir', function() {
       fs.dir('.').mkdir('a', cb)
       cb.result()
       fs.statSync('a').isDirectory().should.be.true
     })
 
-    it('Should ignore mode', function () {
+    it('Should ignore mode', function() {
       fs.dir('.').mkdir('a', 0777, cb)
       cb.result()
       fs.statSync('a').isDirectory().should.be.true
     })
 
-    it('Should throw EEXIST on existing item', function () {
+    it('Should throw EEXIST on existing item', function() {
       fs.dir('a').mkdir('a', cb)
       cb.error('EEXIST')
     })
 
-    it('Should throw ENOENT on non-existent parent', function () {
+    it('Should throw ENOENT on non-existent parent', function() {
       fs.mkdir('a', cb)
       cb.error('ENOENT')
     })
 
-    it('Should throw ENOTDIR on non-dir parent', function () {
+    it('Should throw ENOTDIR on non-dir parent', function() {
       fs.file('a').mkdir('a/b', cb)
       cb.error('ENOTDIR')
     })
 
-    it('Should update parent times', function (done) {
+    it('Should update parent times', function(done) {
       fs.dir('.')
-      testTimesUpdated('.', function () {
+      testTimesUpdated('.', function() {
         fs.mkdir('dir')
       }, done)
     })
   })
 
-  describe('.rmdir()', function () {
-    it('Should remove an existing direcory', function () {
+  describe('.rmdir()', function() {
+    it('Should remove an existing direcory', function() {
       fs.dir('a/b')
       fs.rmdirSync('a/b')
       fs.existsSync('a/b').should.be.false
     })
 
-    it('Should throw ENOTEMPTY for non empty dirs', function () {
+    it('Should throw ENOTEMPTY for non empty dirs', function() {
       fs.dir('a/b/c')
 
       fs.rmdir('a/b', cb)
@@ -240,7 +240,7 @@ describe('Fake FS', function () {
       cb.error('ENOTEMPTY')
     })
 
-    it('Should throw an ENOTDIR error on file', function () {
+    it('Should throw an ENOTDIR error on file', function() {
       fs.file('a/file.txt')
 
       fs.rmdir('a/file.txt', cb)
@@ -248,17 +248,17 @@ describe('Fake FS', function () {
       cb.error('ENOTDIR')
     })
 
-    it('Should update dir times on directory removal', function (done) {
+    it('Should update dir times on directory removal', function(done) {
       fs.dir('a/b')
 
-      testTimesUpdated('a', function () {
+      testTimesUpdated('a', function() {
         fs.rmdir('a/b')
       }, done)
     })
   })
 
-  describe('.unlink()', function () {
-    it('Should remove an existing file', function () {
+  describe('.unlink()', function() {
+    it('Should remove an existing file', function() {
       fs.file('a/file.txt')
 
       fs.unlinkSync('a/file.txt')
@@ -266,7 +266,7 @@ describe('Fake FS', function () {
       fs.existsSync('a/file.txt').should.be.false
     })
 
-    it('Should throw an EISDIR error on directory', function () {
+    it('Should throw an EISDIR error on directory', function() {
       fs.dir('a/b')
 
       fs.unlink('a/b', cb)
@@ -274,17 +274,17 @@ describe('Fake FS', function () {
       cb.error('EISDIR')
     })
 
-    it('Should update dir times on file removal', function (done) {
+    it('Should update dir times on file removal', function(done) {
       fs.file('a/file.txt')
 
-      testTimesUpdated('a', function () {
+      testTimesUpdated('a', function() {
         fs.unlink('a/file.txt')
       }, done)
     })
   })
 
-  describe('.rename()', function () {
-    it('Should rename an existing file', function () {
+  describe('.rename()', function() {
+    it('Should rename an existing file', function() {
       fs.file('a/file.txt')
 
       fs.renameSync('a/file.txt', 'a/file-new.txt')
@@ -293,7 +293,7 @@ describe('Fake FS', function () {
       fs.existsSync('a/file-new.txt').should.be.true
     })
 
-    it('Should rename (move) an existing file', function () {
+    it('Should rename (move) an existing file', function() {
       fs.file('a/file.txt')
       fs.dir('c/d')
 
@@ -303,7 +303,7 @@ describe('Fake FS', function () {
       fs.existsSync('c/d/file-new.txt').should.be.true
     })
 
-    it('Should rename an existing directory', function () {
+    it('Should rename an existing directory', function() {
       fs.dir('a/b')
 
       fs.renameSync('a/b', 'a/b-new')
@@ -312,7 +312,7 @@ describe('Fake FS', function () {
       fs.existsSync('a/b-new').should.be.true
     })
 
-    it('Should rename (move) an existing directory', function () {
+    it('Should rename (move) an existing directory', function() {
       fs.dir('a/b')
       fs.dir('c/d')
 
@@ -322,7 +322,7 @@ describe('Fake FS', function () {
       fs.existsSync('c/d/b-new').should.be.true
     })
 
-    it('Should throw EPERM when new path points to an existing directory', function () {
+    it('Should throw EPERM when new path points to an existing directory', function() {
       fs.dir('a/b')
       fs.dir('c/d')
 
@@ -331,7 +331,7 @@ describe('Fake FS', function () {
       cb.error('EPERM')
     })
 
-    it('Should not throw EPERM when new path points to existing file', function () {
+    it('Should not throw EPERM when new path points to existing file', function() {
       fs.file('a/file1.txt')
       fs.file('c/file2.txt')
 
@@ -340,7 +340,7 @@ describe('Fake FS', function () {
       cb.result()
     })
 
-    it('Should throw ENOENT when new (directory) path points to a non-existent parent', function () {
+    it('Should throw ENOENT when new (directory) path points to a non-existent parent', function() {
       fs.dir('a/b')
 
       fs.rename('a/b', 'c/d', cb)
@@ -348,7 +348,7 @@ describe('Fake FS', function () {
       cb.error('ENOENT')
     })
 
-    it('Should throw ENOTDIR when new path points to a parent that is not a directory', function () {
+    it('Should throw ENOTDIR when new path points to a parent that is not a directory', function() {
       fs.dir('a/b')
       fs.file('c')
 
@@ -357,19 +357,19 @@ describe('Fake FS', function () {
       cb.error('ENOTDIR')
     })
 
-    it('Should update dir times on rename (move)', function (done) {
+    it('Should update dir times on rename (move)', function(done) {
       fs.dir('a/b')
       fs.dir('c/d')
 
       var oldPathBefore = snapshotTimes('a')
       var newPathBefore = snapshotTimes('c/d')
 
-      setTimeout(function () {
+      setTimeout(function() {
         fs.renameSync('a/b', 'c/d/b-new')
         var oldPathNow = snapshotTimes('a')
         var newPathNow = snapshotTimes('c/d')
 
-        var testTimesInner = function (before, now) {
+        var testTimesInner = function(before, now) {
           now.mtime.should.be.above(before.mtime)
           now.mtime.should.be.equal(now.ctime)
         }
@@ -382,81 +382,81 @@ describe('Fake FS', function () {
     })
   })
 
-  describe('.readFile()', function () {
-    it('Should read file contents', function () {
+  describe('.readFile()', function() {
+    it('Should read file contents', function() {
       var content = new Buffer([1, 2, 3])
       fs.file('bin', content).readFile('bin', cb)
       cb.result().should.equal(content)
     })
 
-    it('Should decode file contents', function () {
+    it('Should decode file contents', function() {
       fs.file('file.txt', new Buffer([97])).readFile('file.txt', 'ascii', cb)
       cb.result().should.equal('a')
     })
 
-    it('Should throw ENOENT on non-existent file', function () {
+    it('Should throw ENOENT on non-existent file', function() {
       fs.readFile('foo', cb)
       cb.error('ENOENT')
     })
 
-    it('Should throw EISDIR on directory', function () {
+    it('Should throw EISDIR on directory', function() {
       fs.dir('dir').readFile('dir', cb)
       cb.error('EISDIR')
     })
   })
 
-  describe('.writeFile()', function () {
-    it('Should write file', function () {
+  describe('.writeFile()', function() {
+    it('Should write file', function() {
       fs.dir('.').writeFile('a', 'hello', cb)
       cb.result()
       fs.readFileSync('a', 'utf8').should.equal('hello')
     })
 
-    it('Should respect encoding', function () {
+    it('Should respect encoding', function() {
       fs.dir('.').writeFile('a', 'TWFu', 'base64', cb)
       cb.result()
       fs.readFileSync('a', 'utf8').should.equal('Man')
     })
 
-    it('Should allow to write buffers', function () {
+    it('Should allow to write buffers', function() {
       fs.dir('.').writeFile('a', new Buffer([10]), cb)
       cb.result()
       fs.readFileSync('a')[0].should.equal(10)
     })
 
-    it('Should throw ENOTDIR when parent is not a dir', function () {
+    it('Should throw ENOTDIR when parent is not a dir', function() {
       fs.file('a').writeFile('a/b', '', cb)
       cb.error('ENOTDIR')
     })
 
-    it('Should throw ENOENT whent parent dir does not exist', function () {
+    it('Should throw ENOENT whent parent dir does not exist', function() {
       fs.writeFile('a', '', cb)
       cb.error('ENOENT')
     })
 
-    it('Should update dir times on file creation', function (done) {
+    it('Should update dir times on file creation', function(done) {
       fs.dir('.')
-      testTimesUpdated('.', function () {
+      testTimesUpdated('.', function() {
         fs.writeFile('a')
       }, done)
     })
 
-    it('Should not update dir times on file update', function (done) {
+    it('Should not update dir times on file update', function(done) {
       fs.file('a')
-      testTimes('.', function () {
+      testTimes('.', function() {
         fs.writeFile('a', 'a')
-      }, function (before, now) {
+      }, function(before, now) {
         before.should.eql(now)
         done()
       })
     })
   })
 
-  describe('.patch()', function () {
-    afterEach(function () {
+  describe('.patch()', function() {
+    afterEach(function() {
       fs.unpatch()
     })
-    it('Should patch global fs with self methods', function () {
+    it('Should patch global fs with self methods', function() {
       var global = require('fs')
       var origStat = global.stat
       fs.patch()
@@ -467,8 +467,8 @@ describe('Fake FS', function () {
     })
   })
 
-  describe('.unpatch()', function () {
-    it('Should restore original fs methods', function () {
+  describe('.unpatch()', function() {
+    it('Should restore original fs methods', function() {
       var global = require('fs')
       var origStat = global.stat
       fs.patch()
