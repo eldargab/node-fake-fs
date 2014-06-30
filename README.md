@@ -1,7 +1,7 @@
 # fake-fs
 
 Fake node.js file system for testing. Supports `stat`, `exists`, `readdir`,
-`readFile`, `writeFile`, `mkdir`, `rmdir`, `unlink`, `rename` and their sync counterparts.
+`readFile`, `writeFile`, `appendFile`, `mkdir`, `rmdir`, `unlink`, `rename` and their sync counterparts.
 
 ## Usage
 
@@ -80,7 +80,10 @@ fs.unpatch()
 require('fs').existsSync('foo').should.be.false
 ```
 
-## Notes
+## Gotchas
+
+`writeFile`, `appendFile` do not support `options` argument. Their
+signature is `(filename, data, [encoding], [callback])`.
 
 Methods of new fs object are not binded to the instance.
 That means
@@ -97,62 +100,6 @@ doesn't work. You can use `.bind()` if that's a problem.
 var fs = new Fs().bind()
 var exists = fs.existsSync
 exists('/foo/bar') // now everything is ok
-```
-
-## Supported features
-
-```
-.stat()
-  ✓ Should return stats
-  ✓ Should throw ENOENT on non-existent path
-  ✓ Should support absolute paths
-.readdir()
-  ✓ Should list a dir contents
-  ✓ Should throw ENOENT on non-existent path
-  ✓ Should throw ENOTDIR on non-dir
-.exists()
-  ✓ Should return true on existent path
-  ✓ Should return false for non-existent path
-  ✓ Should return true for root path
-.mkdir()
-  ✓ Should create dir
-  ✓ Should ignore mode
-  ✓ Should throw EEXIST on existing item
-  ✓ Should throw ENOENT on non-existent parent
-  ✓ Should throw ENOTDIR on non-dir parent
-  ✓ Should update parent times
-.rmdir()
-  ✓ Should remove an existing direcory
-  ✓ Should throw ENOTEMPTY for non empty dirs
-  ✓ Should throw an ENOTDIR error on file
-  ✓ Should update dir times on directory removal
-.unlink()
-  ✓ Should remove an existing file
-  ✓ Should throw an EISDIR error on directory
-  ✓ Should update dir times on file removal
-.rename()
-  ✓ Should rename an existing file
-  ✓ Should rename (move) an existing file
-  ✓ Should rename an existing directory
-  ✓ Should rename (move) an existing directory
-  ✓ Should throw EPERM when new path points to an existing directory
-  ✓ Should not throw EPERM when new path points to existing file
-  ✓ Should throw ENOENT when new (directory) path points to a non-existent parent
-  ✓ Should throw ENOTDIR when new path points to a parent that is not a directory
-  ✓ Should update dir times on rename (move)
-.readFile()
-  ✓ Should read file contents
-  ✓ Should decode file contents
-  ✓ Should throw ENOENT on non-existent file
-  ✓ Should throw EISDIR on directory
-.writeFile()
-  ✓ Should write file
-  ✓ Should respect encoding
-  ✓ Should allow to write buffers
-  ✓ Should throw ENOTDIR when parent is not a dir
-  ✓ Should throw ENOENT whent parent dir does not exist
-  ✓ Should update dir times on file creation
-  ✓ Should not update dir times on file update
 ```
 
 ## Installation

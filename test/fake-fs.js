@@ -441,6 +441,15 @@ describe('Fake FS', function() {
       }, done)
     })
 
+    describe('.appendFile()', function() {
+      it('Should append contents to the file', function() {
+        fs.file('a', 'hello')
+        fs.appendFile('a', 'world', cb)
+        cb.result()
+        fs.readFileSync('a', 'utf8').should.equal('helloworld')
+      })
+    })
+
     it('Should not update dir times on file update', function(done) {
       fs.file('a')
       testTimes('.', function() {
