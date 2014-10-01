@@ -85,7 +85,7 @@ require('fs').existsSync('foo').should.be.false
 `writeFile`, `appendFile` do not support `options` argument. Their
 signature is `(filename, data, [encoding], [callback])`.
 
-Methods of new fs object are not binded to the instance.
+Methods of new fs object are not bound to the instance.
 That means
 
 ```javascript
