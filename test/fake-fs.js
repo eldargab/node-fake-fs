@@ -104,6 +104,12 @@ describe('Fake FS', function() {
       fs.readFileSync('bin2')[0].should.equal(10)
     })
 
+    it('Should support options param in place of encoding', function() {
+      fs.file('hello.txt', 'hello')
+        .readFileSync('hello.txt', { encoding: 'utf8' })
+        .should.equal('hello')
+    })
+
     it('Should support options param', function() {
       fs.file('hello.txt', {
         atime: 10,
@@ -394,6 +400,11 @@ describe('Fake FS', function() {
       cb.result().should.equal('a')
     })
 
+    it('Should respect encoding option', function() {
+      fs.file('file.txt', 'a').readFile('file.txt', { encoding: 'utf8' }, cb)
+      cb.result().should.equal('a')
+    })
+
     it('Should throw ENOENT on non-existent file', function() {
       fs.readFile('foo', cb)
       cb.error('ENOENT')
@@ -414,6 +425,12 @@ describe('Fake FS', function() {
 
     it('Should respect encoding', function() {
       fs.dir('.').writeFile('a', 'TWFu', 'base64', cb)
+      cb.result()
+      fs.readFileSync('a', 'utf8').should.equal('Man')
+    })
+
+    it('Should respect encoding from options object', function() {
+      fs.dir('.').writeFile('a', 'TWFu', { encoding: 'base64'}, cb)
       cb.result()
       fs.readFileSync('a', 'utf8').should.equal('Man')
     })
@@ -445,6 +462,13 @@ describe('Fake FS', function() {
       it('Should append contents to the file', function() {
         fs.file('a', 'hello')
         fs.appendFile('a', 'world', cb)
+        cb.result()
+        fs.readFileSync('a', 'utf8').should.equal('helloworld')
+      })
+
+      it('Should respect the encoding option', function() {
+        fs.file('a', 'hello')
+        fs.appendFile('a', 'world', { encoding: 'utf8' }, cb)
         cb.result()
         fs.readFileSync('a', 'utf8').should.equal('helloworld')
       })
