@@ -1,4 +1,9 @@
 
+0.5.0 / 2014-10-12
+==================
+
+ * Support passing an options object or encoding [eventualbuddha].
+
 0.4.0 / 2014-06-30
 ==================
 

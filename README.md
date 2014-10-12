@@ -82,9 +82,6 @@ require('fs').existsSync('foo').should.be.false
 
 ## Gotchas
 
-`writeFile`, `appendFile` do not support `options` argument. Their
-signature is `(filename, data, [encoding], [callback])`.
-
 Methods of new fs object are not bound to the instance.
 That means
 
